@@ -5,19 +5,16 @@ unit Unit1;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs;
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Math,factorio_grid;
 
 type
 
   { TForm1 }
-  TSprites=record
-    pics:array of TPortableNetworkgraphic;
-  end;
+
 
   TForm1 = class(TForm)
     procedure FormClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure loadSprites();
   private
     { private declarations }
   public
@@ -26,33 +23,35 @@ type
 
 var
   Form1: TForm1;
-  testbild:TPortableNetworkGraphic;
+  testbild: TPortableNetworkGraphic;
+  g1:fgrid;
+  scale: real;
+
 implementation
 
 {$R *.lfm}
 
 { TForm1 }
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+  g1:=fgrid.Create(10,10);
+  g1.loadSprites();
+  g1.grid[2][2].btype:=Belt;
+  g1.grid[2][3].btype:=Belt;
+  g1.grid[2][4].btype:=Belt;
+  g1.grid[2][2].dir:=2;
+  g1.grid[2][3].dir:=2;
+  g1.grid[2][4].dir:=1;
+  testbild := TPortableNetworkGraphic.Create;
+end;
 
 procedure TForm1.FormClick(Sender: TObject);
 begin
-    loadSprites();
-    Form1.canvas.draw(32,32,testbild);
-    //Form1.Canvas.Line(10,10,10,20);
+  //loadSprites();
+  Form1.canvas.draw(0,0,g1.draw());
+  //Form1.Canvas.Line(10,10,10,20);
 end;
 
-procedure TForm1.loadSprites();
-var
-  fnum:TStringList;
-begin
-     fnum:=FindAllFiles();
-     testbild.LoadFromFile('./Belts/Belt_Down.png') ;
 
-end;
-
-procedure TForm1.FormCreate(Sender: TObject);
-begin
-  testbild:=TPortableNetworkGraphic.create;
-end;
 
 end.
-
