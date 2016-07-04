@@ -1,8 +1,8 @@
 object Form1: TForm1
-  Left = -1
-  Height = 240
-  Top = 317
-  Width = 320
+  Left = -18
+  Height = 640
+  Top = 211
+  Width = 640
   Caption = 'Form1'
   OnClick = FormClick
   OnCreate = FormCreate

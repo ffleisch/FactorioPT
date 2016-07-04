@@ -34,14 +34,14 @@ implementation
 { TForm1 }
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  g1:=fgrid.Create(10,10);
+  g1:=fgrid.Create(40,40);
   g1.loadSprites();
   g1.grid[2][2].btype:=Belt;
   g1.grid[2][3].btype:=Belt;
   g1.grid[2][4].btype:=Belt;
-  g1.grid[2][2].dir:=1;
-  g1.grid[2][3].dir:=1;
-  g1.grid[2][4].dir:=2;
+  g1.grid[2][2].dir:=2;
+  g1.grid[2][3].dir:=3;
+  g1.grid[2][4].dir:=1;
   testbild := TPortableNetworkGraphic.Create;
 end;
 

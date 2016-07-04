@@ -5,40 +5,45 @@ unit factorio_grid;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,Math;
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Math;
 
 type
-  BeltType = (Belt,UndergroundBelt);
+  BeltType = (Background, Belt, UndergroundBelt);
+
   TBelt = record
-    btype:BeltType;
+    btype: BeltType;
     dir: integer;
   end;
-  fgrid=class
+
+  fgrid = class
     procedure loadSprites();
     function SpriteStretch(PicIn: TPortableNetworkGraphic;
       sc: real): TPortableNetworkGraphic;
-    public
-      scale:real;
-      grid:array of array of TBelt;
-      Constructor Create(width,height:integer);
-      function draw():TPortableNetworkGraphic;
 
-    private
-      BeltPicSize:integer;
-      Belts: array of TPortableNetworkGraphic;
-      Pic:TPortableNetworkGraphic;
+  public
+    scale: real;
+    grid: array of array of TBelt;
+    constructor Create(Width, Height: integer);
+    function draw(): TPortableNetworkGraphic;
+    procedure resize(width:integer=-1,height:integer=-1;sc:real=-1);
+  private
+    BeltPicSize: integer;
+    Belts: array of TPortableNetworkGraphic;
+    Backgrounds: array of TPortableNetworkGraphic;
+    BackgroundsNum: integer;
+    Pic: TPortableNetworkGraphic;
   end;
 
 implementation
 
-constructor fgrid.Create(width,height:integer);
+constructor fgrid.Create(Width, Height: integer);
 begin
-     BeltPicSize:=32;
-     scale:=1;
-     SetLength(grid,width,height);
-     Pic:=TPortableNetworkGraphic.Create;
-     Pic.Width:=math.ceil(BeltPicSize*Scale)*width;
-     Pic.Height:=math.ceil(BeltPicSize*Scale)*height;
+  BeltPicSize := 32;
+  scale := 0.25;
+  SetLength(grid, Width, Height);
+  Pic := TPortableNetworkGraphic.Create;
+  Pic.Width := Math.floor(BeltPicSize * Scale) * Width;
+  Pic.Height := Math.floor(BeltPicSize * Scale) * Height;
 end;
 
 function fgrid.SpriteStretch(PicIn: TPortableNetworkGraphic;
@@ -80,26 +85,63 @@ begin
     i := i + 1;
   end;
   fnum.Free;
+  fnum := FindAllFiles('./Background');
+  i := 0;
+  while i < fnum.Count do
+  begin
+    SetLength(Backgrounds, Length(Backgrounds) + 1);
+    Backgrounds[i] := TPortableNetworkGraphic.Create;
+    Backgrounds[i].LoadFromFile(fnum.Strings[i]);
+    Backgrounds[i] := SpriteStretch(Backgrounds[i], scale);
+    i := i + 1;
+  end;
+  BackgroundsNum := i;
+  fnum.Free;
 end;
 
-function fgrid.draw():TPortableNetworkGraphic;
+function fgrid.draw(): TPortableNetworkGraphic;
 var
-  m,n:integer;
-  x,y:integer;
+  m, n: integer;
+  x, y: integer;
 begin
-  for m:=0 to Length(grid)-1 do
+  for m := 0 to Length(grid) - 1 do
   begin
-    for n:=0 to Length(grid[0])-1 do
+    for n := 0 to Length(grid[0]) - 1 do
     begin
-      if(grid[m][n].btype=Belt)then
+      x := m * Math.floor(BeltPicSize * Scale);
+      y := n * Math.floor(BeltPicSize * Scale);
+      if (grid[m][n].btype = Belt) then
       begin
-        x:=m*math.floor(BeltPicSize*Scale);
-        y:=n*math.floor(BeltPicSize*Scale);
-        Pic.canvas.draw(x,y,Belts[grid[m][n].dir]);
+
+        Pic.canvas.draw(x, y, Belts[grid[m][n].dir]);
+      end
+      else
+      begin
+        Pic.canvas.draw(x, y, Backgrounds[random(BackgroundsNum)]);
       end;
+
     end;
   end;
-  draw:=Pic;
+  draw := Pic;
 end;
-end.
 
+procedure fgrid.resize(width:integer=-1,height:integer=-1;sc:real=-1);
+begin
+
+    if(sc>0)then
+    begin
+      scale:=sc;
+    end;
+    if(width>0)then
+    begin
+      SetLength(grid,width);
+      Pic.Width := Math.floor(BeltPicSize * Scale) * width;
+    end;
+    if(height>0)then
+    begin
+      SetLength(grid,,height);
+      Pic.Height := Math.floor(BeltPicSize * Scale) * height;
+    end;
+end;
+
+end.
