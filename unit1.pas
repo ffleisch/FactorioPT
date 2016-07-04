@@ -5,7 +5,8 @@ unit Unit1;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Math,factorio_grid;
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
+  Math, factorio_grid;
 
 type
 
@@ -13,8 +14,12 @@ type
 
 
   TForm1 = class(TForm)
+    Scale_inc: TButton;
+    Scale_dec: TButton;
+    procedure Scale_decClick(Sender: TObject);
     procedure FormClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure Scale_incClick(Sender: TObject);
   private
     { private declarations }
   public
@@ -33,16 +38,41 @@ implementation
 
 { TForm1 }
 procedure TForm1.FormCreate(Sender: TObject);
+var
+  i:integer;
+  a,b:integer;
 begin
-  g1:=fgrid.Create(40,40);
+  randomize();
+  g1:=fgrid.Create(50,50);
+
   g1.loadSprites();
-  g1.grid[2][2].btype:=Belt;
-  g1.grid[2][3].btype:=Belt;
-  g1.grid[2][4].btype:=Belt;
-  g1.grid[2][2].dir:=2;
-  g1.grid[2][3].dir:=3;
-  g1.grid[2][4].dir:=1;
+
+  for i:=0 to 100 do
+  begin
+       a:=random(50);
+       b:=random(50);
+  g1.grid[a][b].btype:=UndergroundBelt;
+  g1.grid[a][b].dir:=random(3);
+  end;
+  for i:=0 to 100 do
+  begin
+       a:=random(50);
+       b:=random(50);
+  g1.grid[a][b].btype:=Belt;
+  g1.grid[a][b].dir:=random(3);
+  end;
+  for i:=0 to 100 do
+  begin
+       a:=random(50);
+       b:=random(50);
+  g1.grid[a][b].btype:=Obstacle;
+  end;
   testbild := TPortableNetworkGraphic.Create;
+end;
+
+procedure TForm1.Scale_incClick(Sender: TObject);
+begin
+  g1.resize(-1,-1,g1.scale*2);
 end;
 
 procedure TForm1.FormClick(Sender: TObject);
@@ -50,6 +80,11 @@ begin
   //loadSprites();
   Form1.canvas.draw(0,0,g1.draw());
   //Form1.Canvas.Line(10,10,10,20);
+end;
+
+procedure TForm1.Scale_decClick(Sender: TObject);
+begin
+  g1.resize(-1,-1,g1.scale/2);
 end;
 
 
