@@ -1,12 +1,11 @@
 object Form1: TForm1
-  Left = 446
-  Height = 636
-  Top = 31
+  Left = 113
+  Height = 630
+  Top = 59
   Width = 640
   Caption = 'Form1'
-  ClientHeight = 636
-  ClientWidth = 640
-  OnClick = FormClick
+  ClientHeight = 0
+  ClientWidth = 0
   OnCreate = FormCreate
   LCLVersion = '1.6.0.4'
   object Scale_inc: TButton

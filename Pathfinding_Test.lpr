@@ -7,7 +7,7 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, Unit1, factorio_grid
+  Forms, Unit1, factorio_grid, Node
   { you can add units after this };
 
 {$R *.res}
