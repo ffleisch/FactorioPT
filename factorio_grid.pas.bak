@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Math;
 
 type
-  BeltType = (Background, Belt, UndergroundBelt,Obstacle);
+  BeltType = (Background, Belt, UndergroundBelt, Obstacle);
 
   TBelt = record
     btype: BeltType;
@@ -20,12 +20,15 @@ type
     function SpriteStretch(PicIn: TPortableNetworkGraphic;
       sc: real): TPortableNetworkGraphic;
 
+
   public
     scale: real;
     grid: array of array of TBelt;
     constructor Create(Width, Height: integer);
-    function draw(): TPortableNetworkGraphic;
-    procedure resize(width:integer;height:integer;sc:real);
+    function draw(gridx, gridy: integer;
+      bild: TPortableNetworkGraphic): TPortableNetworkGraphic;
+    function toGridCoord(x, y, gridx, gridy: integer; bild: TPortableNetworkGraphic): TPoint;
+    procedure resize(Width: integer; Height: integer; sc: real);
   private
 
     BeltPicSize: integer;
@@ -51,8 +54,8 @@ begin
   scale := 0.5;
   SetLength(grid, Width, Height);
   Pic := TPortableNetworkGraphic.Create;
-  Pic.Width := Math.floor(BeltPicSize * Scale) * Width;
-  Pic.Height := Math.floor(BeltPicSize * Scale) * Height;
+  Pic.Width := Math.floor(BeltPicSize * scale) * Width;
+  Pic.Height := Math.floor(BeltPicSize * scale) * Height;
 end;
 
 function fgrid.SpriteStretch(PicIn: TPortableNetworkGraphic;
@@ -139,80 +142,106 @@ begin
   fnum.Free;
 end;
 
-function fgrid.draw(): TPortableNetworkGraphic;
+function fgrid.toGridCoord(x, y, gridx, gridy: integer; bild: TPortableNetworkGraphic): TPoint;
+begin
+  ;
+  toGridCoord.x := Math.floor((x+(bild.Width / 2) ) / (BeltPicSize * scale)) - gridx;
+  toGridCoord.y := Math.floor((y+(bild.Height / 2) ) / (BeltPicSize * scale)) - gridy;
+end;
+
+function fgrid.draw(gridx, gridy: integer;
+  bild: TPortableNetworkGraphic): TPortableNetworkGraphic;
 var
   m, n: integer;
   x, y: integer;
+  xmax, ymax: integer;
+  Height, Width: integer;
+  mx, my: integer;
+  px, py: integer;
 begin
-  for m := 0 to Length(grid) - 1 do
+  Height := bild.Height;
+  Width := bild.Width;
+  bild.canvas.brush.color := clBlack;
+  bild.canvas.fillRect(0, 0, Width, Height);
+  xmax := Math.ceil(Width / (BeltPicSize * scale));
+  ymax := Math.ceil(Height / (BeltPicSize * scale));
+  mx := Math.floor(Length(grid) / 2);
+  my := Math.floor(Length(grid[0]) / 2);
+  for m := 0 to xmax do
   begin
-    for n := 0 to Length(grid[0]) - 1 do
+    for n := 0 to ymax do
     begin
-      x := m * Math.floor(BeltPicSize * Scale);
-      y := n * Math.floor(BeltPicSize * Scale);
-      if (grid[m][n].btype = Belt) then
+      x := m * Math.floor(BeltPicSize * scale);
+      y := n * Math.floor(BeltPicSize * scale);
+      px := m + gridx - Math.ceil((xmax / 2));
+      py := n + gridy - Math.ceil((ymax / 2));
+      if ((px >= 0) and (px < Length(grid)) and (py >= 0) and (py < Length(grid[0]))) then
       begin
-        Pic.canvas.draw(x, y, Belts[grid[m][n].dir]);
-      end
-      else
-      if (grid[m][n].btype = UndergroundBelt) then
-      begin
-        Pic.canvas.draw(x, y, UBelts[grid[m][n].dir]);
-      end
-      else
-      if (grid[m][n].btype = Obstacle)then
-      begin
-        Pic.canvas.draw(x, y, Obstacles[random(ObstaclesNum)]);
-      end
-      else
-      begin
-        Pic.canvas.draw(x, y, Backgrounds[random(BackgroundsNum)]);
+        if (grid[px][py].btype = Belt) then
+        begin
+          bild.canvas.draw(x, y, Belts[grid[px][py].dir]);
+        end
+        else
+        if (grid[px][py].btype = UndergroundBelt) then
+        begin
+          bild.canvas.draw(x, y, UBelts[grid[px][py].dir]);
+        end
+        else
+        if (grid[px][py].btype = Obstacle) then
+        begin
+          bild.canvas.draw(x, y, Obstacles[random(ObstaclesNum)]);
+        end
+        else
+        begin
+          bild.canvas.draw(x, y, Backgrounds[random(BackgroundsNum)]);
+        end;
+
       end;
 
     end;
   end;
-  draw := Pic;
+  draw := bild;
 end;
 
-procedure fgrid.resize(width:integer;height:integer;sc:real);
+procedure fgrid.resize(Width: integer; Height: integer; sc: real);
 var
-  i:integer;
+  i: integer;
 begin
 
-    if(sc>0)then
-    begin
+  if (sc > 0) then
+  begin
 
-      for i:=0 to Length(OBelts) do
-      begin
-        Belts[i] := SpriteStretch(OBelts[i]-1, sc);
-      end;
-       for i:=0 to Length(OBelts) do
-      begin
-        UBelts[i] := SpriteStretch(OUBelts[i]-1, sc);
-      end;
-        for i:=0 to Length(OObstacles) do
-      begin
-        Obstacles[i] := SpriteStretch(OObstacles[i]-1, sc);
-      end;
-         for i:=0 to Length(OBackgrounds) do
-      begin
-        Backgrounds[i] := SpriteStretch(OBackgrounds[i]-1, sc);
-      end;
-      scale:=sc;
+    for i := 0 to Length(OBelts) - 1 do
+    begin
+      Belts[i] := SpriteStretch(OBelts[i], sc);
+    end;
+    for i := 0 to Length(OBelts) - 1 do
+    begin
+      UBelts[i] := SpriteStretch(OUBelts[i], sc);
+    end;
+    for i := 0 to Length(OObstacles) - 1 do
+    begin
+      Obstacles[i] := SpriteStretch(OObstacles[i], sc);
+    end;
+    for i := 0 to Length(OBackgrounds) - 1 do
+    begin
+      Backgrounds[i] := SpriteStretch(OBackgrounds[i], sc);
+    end;
+    scale := sc;
 
-      Pic.Width := Math.floor(BeltPicSize * Scale) * Length(grid);
-      Pic.Height := Math.floor(BeltPicSize * Scale) * Length(grid[0]);
-    end;
-    if(width>0)then
-    begin
-      SetLength(grid,width);
-      Pic.Width := Math.floor(BeltPicSize * Scale) * width;
-    end;
-    if(height>0)then
-    begin
-      SetLength(grid,Length(grid),height);
-      Pic.Height := Math.floor(BeltPicSize * Scale) * height;
-    end;
+    Pic.Width := Math.floor(BeltPicSize * Scale) * Length(grid);
+    Pic.Height := Math.floor(BeltPicSize * Scale) * Length(grid[0]);
+  end;
+  if (Width > 0) then
+  begin
+    SetLength(grid, Width);
+    Pic.Width := Math.floor(BeltPicSize * Scale) * Width;
+  end;
+  if (Height > 0) then
+  begin
+    SetLength(grid, Length(grid), Height);
+    Pic.Height := Math.floor(BeltPicSize * Scale) * Height;
+  end;
 end;
 
 end.

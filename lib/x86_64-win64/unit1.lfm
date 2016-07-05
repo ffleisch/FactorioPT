@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 119
+  Left = 446
   Height = 636
-  Top = 100
+  Top = 31
   Width = 640
   Caption = 'Form1'
   ClientHeight = 636
@@ -26,5 +26,13 @@ object Form1: TForm1
     Caption = '-'
     OnClick = Scale_decClick
     TabOrder = 1
+  end
+  object Panel1: TPanel
+    Left = 40
+    Height = 614
+    Top = 10
+    Width = 592
+    TabOrder = 2
+    OnMouseDown = Panel1MouseDown
   end
 end
