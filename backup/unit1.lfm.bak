@@ -1,0 +1,37 @@
+object Form1: TForm1
+  Left = 113
+  Height = 630
+  Top = 59
+  Width = 640
+  Caption = 'Form1'
+  ClientHeight = 630
+  ClientWidth = 640
+  OnCreate = FormCreate
+  LCLVersion = '1.4.4.0'
+  object Scale_inc: TButton
+    Left = 8
+    Height = 25
+    Top = 8
+    Width = 27
+    Caption = '+'
+    OnClick = Scale_incClick
+    TabOrder = 0
+  end
+  object Scale_dec: TButton
+    Left = 8
+    Height = 25
+    Top = 40
+    Width = 27
+    Caption = '-'
+    OnClick = Scale_decClick
+    TabOrder = 1
+  end
+  object Panel1: TPanel
+    Left = 40
+    Height = 614
+    Top = 10
+    Width = 592
+    TabOrder = 2
+    OnMouseDown = Panel1MouseDown
+  end
+end

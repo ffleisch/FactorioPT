@@ -8,7 +8,7 @@ uses
   Classes, SysUtils;
 
 type
-  Node = class
+  MyNode = class
   public
   private
   end;
